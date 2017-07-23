@@ -1,14 +1,13 @@
-FROM mhart/alpine-node:7.6.0
+FROM mhart/alpine-node:4.4
 
-WORKDIR /src
+#Create the npm install layer independently
+RUN mkdir /app
+COPY app/package.json /app
+RUN cd /app && npm install
 
-# Add package.json
-ADD app/src/package.json /src/package.json
+# Add app source files
+ADD app /app/
 
-#install node modules
-#RUN npm install
-
-#Add the source code
-ADD app/src /src
-
+WORKDIR /app
+ENV NODE_ENV production
 CMD ["node", "server.js"]
