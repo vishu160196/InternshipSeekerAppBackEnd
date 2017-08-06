@@ -12,7 +12,7 @@ var url;
 // as if admin
 if (DEVELOPMENT) {
   headers.Authorization = 'Bearer ' + process.env.ADMIN_TOKEN;
-  url = `https://data.${process.env.PROJECT_NAME}.hasura-app.io`;
+  url = 'https://data.${process.env.PROJECT_NAME}.hasura-app.io';
 } else {
   url = 'http://data.hasura';
 }
@@ -22,45 +22,46 @@ headers['X-Hasura-Role'] = 'admin';
 headers['X-Hasura-User-Id'] = 1;
 
 app.get('/', function (req, res) {
-  var schemaFetchUrl = url + '/v1/query';
-  var options = {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      type: 'select',
-      args: {
-        table: {
-          schema: 'hdb_catalog',
-          name: 'hdb_table'
-        },
-        columns: ['*.*'],
-        where: { table_schema: 'public' }
-    }})
-  };
-  fetch(schemaFetchUrl, options)
-    .then(
-      (response) => {
-        response.text()
-          .then(
-            (data) => {
-              res.send(data);
-            },
-            (e) => {
-              res.send('Error in fetching current schema: ' + err.toString());
-            })
-          .catch((e) => {
-            e.stack();
-            res.send('Error in fetching current schema: ' + e.toString());
-          });
-      },
-      (e) => {
-        console.error(e);
-        res.send('Error in fetching current schema: ' + e.toString());
-      })
-    .catch((e) => {
-      e.stackTrace();
-      res.send('Error in fetching current schema: ' + e.toString());
-    });
+  // var schemaFetchUrl = url + '/v1/query';
+  // var options = {
+  //   method: 'POST',
+  //   headers : headers,
+  //   body: JSON.stringify({
+  //     type: 'select',
+  //     args: {
+  //       table: {
+  //         schema: 'hdb_catalog',
+  //         name: 'hdb_table'
+  //       },
+  //       columns: ['*.*'],
+  //       where: { table_schema: 'public' }
+  //   }})
+  // };
+  // fetch(schemaFetchUrl, options)
+  //   .then(
+  //     (response) => {
+  //       response.text()
+  //         .then(
+  //           (data) => {
+  //             res.send(data);
+  //           },
+  //           (e) => {
+  //             res.send('Error in fetching current schema: ' + err.toString());
+  //           })
+  //         .catch((e) => {
+  //           e.stack();
+  //           res.send('Error in fetching current schema: ' + e.toString());
+  //         });
+  //     },
+  //     (e) => {
+  //       console.error(e);
+  //       res.send('Error in fetching current schema: ' + e.toString());
+  //     })
+  //   .catch((e) => {
+  //     e.stackTrace();
+  //     res.send('Error in fetching current schema: ' + e.toString());
+  //   });
+  res.send('hello world');
 });
 
 /*
