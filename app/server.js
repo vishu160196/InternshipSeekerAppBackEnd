@@ -72,7 +72,6 @@ headers['X-Hasura-User-Id'] = 1;
                                            student_id : id,
                                            name : req.body.signUpName,
                                            username : authTableUser.username,
-                                           password : authTableUser.password,
                                            email : req.body.signUpEmail,
                                            institution : req.body.signUpInstitution,
                                            year_of_admission : req.body.signUpYoa,
@@ -90,6 +89,9 @@ headers['X-Hasura-User-Id'] = 1;
                         'https://data.outfight74.hasura-app.io/v1/query',
                         { json: addStudentInfo },
                         function (error, response, body) {
+                          console.log(response);
+                          console.log(error);
+                          console.log(body);
                             if (!error && response.statusCode === 200) { // student_info created successfully
                                 // assign role to student 
                                 request.post(
@@ -246,9 +248,8 @@ headers['X-Hasura-User-Id'] = 1;
                                            emp_id : body.hasura_id,
                                            name : req.body.signUpName,
                                            username : authTableUser.username,
-                                           password : authTableUser.password,
                                            email : req.body.signUpEmail,
-                                           company : req.body.signUpInstitution,
+                                           company : req.body.company,
                                            dob : req.body.signUpDob,
                                            gender : req.body.gender,
                                            designation : req.body.designation
