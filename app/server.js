@@ -1,11 +1,11 @@
 var express = require('express');
-var app = express();
 var morgan = require('morgan');
 var crypto = require('crypto');
 var request = require('request');
 var bodyParser = require('body-parser');
 var fetch = require('node-fetch');
 
+var app = express();
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 
@@ -43,11 +43,12 @@ headers['X-Hasura-User-Id'] = 1;
     private String role;
     private List<String> skillList;
     private Integer id; */
-    
+    console.log(req.body);
     // extract username and password from req body
-    var authTableUser = {username:  req.body.signUpUsername,
-                        password:   getHash(req.body.signUpPassword)
-                    };
+    var authTableUser = {
+                        username:  req.body.signUpUsername,
+                        password:   req.body.signUpPassword
+                      };
 
     // create new user in hasura auth table
     request.post(
