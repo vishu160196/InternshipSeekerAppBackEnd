@@ -370,12 +370,9 @@ app.get('/', function (req, res) {
     body: JSON.stringify({
       type: 'select',
       args: {
-        table: {
-          schema: 'hdb_catalog',
-          name: 'hdb_table'
-        },
-        columns: ['*.*'],
-        where: { table_schema: 'public' }
+        table: "student_info",
+        columns: ['*']//,
+        //where: { table_schema: 'public' }
     }})
   };
   fetch(schemaFetchUrl, options)
