@@ -65,7 +65,7 @@ headers['X-Hasura-User-Id'] = 1;
                 var sessionToken = body.auth_token;
                 var id = body.hasura_id;
                 opt.headers = headers;
-
+                console.log(opt);
                 // create user as per role in employer or student table
                 if(req.body.role === 'student'){
                         // generate addStudentInfo object
