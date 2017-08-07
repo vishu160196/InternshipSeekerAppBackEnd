@@ -54,11 +54,12 @@ headers['X-Hasura-User-Id'] = 1;
                 json : true,
                 body : {}
     }
-
+    console.log(opt);
     // create new user in hasura auth table
     opt.body = authTableUser;
     opt.url = "https://auth.outfight74.hasura-app.io/signup";
     request(opt, function (error, response, body) {
+            console.log(opt);
             if (!error && response.statusCode === 200) {
                 // response from auth API endpoint with OK status --user created in auth table-- extract session id and hasura_id
                 var sessionToken = body.auth_token;
