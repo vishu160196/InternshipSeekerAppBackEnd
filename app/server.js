@@ -80,9 +80,9 @@ headers['X-Hasura-User-Id'] = 1;
                                            username : authTableUser.username,
                                            email : req.body.signUpEmail,
                                            institution : req.body.signUpInstitution,
-                                           year_of_admission : req.body.signUpYoa,
-                                           year_of_passing : req.body.signUpYop,
-                                           percentage : req.body.signUpPercentage,
+                                           year_of_admission : req.body.yearOfAdmission,
+                                           year_of_passing : req.body.yearOfPassing,
+                                           percentage : req.body.percentage,
                                            dob : req.body.signUpDob,
                                            gender : req.body.gender,
                                            path_to_cv : req.body.signUpPathToCV
