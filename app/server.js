@@ -1,6 +1,5 @@
 var express = require('express');
 var morgan = require('morgan');
-var crypto = require('crypto');
 var request = require('request');
 var bodyParser = require('body-parser');
 var fetch = require('node-fetch');
@@ -49,16 +48,22 @@ headers['X-Hasura-User-Id'] = 1;
                         username:  req.body.signUpUsername,
                         password:   req.body.signUpPassword
                       };
+    
+    var opt = {
+                method : "POST",
+                json : true,
+                body : {}
+    }
 
     // create new user in hasura auth table
-    request.post(
-        'https://auth.outfight74.hasura-app.io/signup',
-        { json: authTableUser },
-        function (error, response, body) {
+    opt.body = authTableUser;
+    opt.url = "https://auth.outfight74.hasura-app.io/signup";
+    request(opt, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 // response from auth API endpoint with OK status --user created in auth table-- extract session id and hasura_id
                 var sessionToken = body.auth_token;
                 var id = body.hasura_id;
+                opt.headers = headers;
 
                 // create user as per role in employer or student table
                 if(req.body.role === 'student'){
@@ -83,25 +88,24 @@ headers['X-Hasura-User-Id'] = 1;
                                         }
                                     ]
                             }
-                        }
+                        };
+
                         // create student_info
-                        request.post(
-                        'https://data.outfight74.hasura-app.io/v1/query',
-                        { json: addStudentInfo },
-                        function (error, response, body) {
+                        opt.body = addStudentInfo;
+                        opt.url = "https://data.outfight74.hasura-app.io/v1/query"
+                        request(opt, function (error, response, body) {
+
                           console.log(response);
                           console.log(error);
                           console.log(body);
+                          
                             if (!error && response.statusCode === 200) { // student_info created successfully
-                                // assign role to student 
-                                request.post(
-                                    'https://auth.outfight74.hasura-app.io/admin/user/assign-role',
-                                    {json : {
-                                                hasura_id : id,
+                                // assign role to student
+                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/assign-role"
+                                opt.body = {    hasura_id : id,
                                                 role : 'student'
-                                            }
-                                    },
-                                    function (error, response, body){
+                                            };
+                                request(opt, function (error, response, body){
                                         if(!error && response.statusCode === 200){
                                             // role assigned successfully add skills
                                             var skillList = req.body.skillList;
@@ -119,16 +123,17 @@ headers['X-Hasura-User-Id'] = 1;
 
                                             var i = 0;
                                             while(i < skillList.length){
-                                                addSkillList.args.objects.push(skillList[i]);
+                                                addSkillList.args.objects.push({id : id, skill : skillList[i]});
                                                 i++;
                                             }
-                                            
-                                            request.post('https://data.outfight74.hasura-app.io/v1/query',
-                                                        {json : addSkillList},
-                                                        function(error, response, body){
+                                            opt.body = addSkillList;
+                                            opt.url = "https://data.outfight74.hasura-app.io/v1/query"
+                                            request(opt, function(error, response, body){
                                                             if(!error && response.statusCode === 200){
                                                                 // skills written signup complete
                                                                 res.send('Success');
+                                                                // logut the user
+                                                                opt.method = "GET";
                                                             }
                                                             else{
                                                                 // skills not written -- delete from student_info as well as auth
@@ -139,16 +144,14 @@ headers['X-Hasura-User-Id'] = 1;
                                                                         where : {student_id : id}
                                                                     }
                                                                 };
-                                                                request.post(
-                                                                        'https://data.outfight74.hasura-app.io/v1/query',
-                                                                        {json : deleteStudentInfo},
-                                                                        function (error, response, body){
+                                                                opt.body = deleteStudentInfo;
+                                                                opt.url = "https://data.outfight74.hasura-app.io/v1/query";
+                                                                request(opt, function (error, response, body){
                                                                             if(!error && response.statusCode === 200){
                                                                                 // no error delete from auth table
-                                                                                request.post(
-                                                                                    'https://auth.outfight74.hasura-app.io/admin/user/delete',
-                                                                                    {json : {hasura_id : id}},
-                                                                                    function (error, response, body){
+                                                                                opt.body = {hasura_id : id};
+                                                                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                                                                request(opt, function (error, response, body){
                                                                                         if(error || response.statusCode != 200)
                                                                                             console.log('id ' + id + ' not created successfully please delete from auth');
                                                                                     });
@@ -178,16 +181,14 @@ headers['X-Hasura-User-Id'] = 1;
                                                                 where : {student_id : id}
                                                             }
                                                         };
-                                            request.post(
-                                                    'https://data.outfight74.hasura-app.io/v1/query',
-                                                    {json : deleteStudentInfo},
-                                                    function (error, response, body){
+                                            opt.body = deleteStudentInfo;
+                                            opt.url = "https://data.outfight74.hasura-app.io/v1/query";       
+                                            request(opt, function (error, response, body){
                                                         if(!error && response.statusCode === 200){
                                                             // no error delete from auth table
-                                                            request.post(
-                                                                'https://auth.outfight74.hasura-app.io/admin/user/delete',
-                                                                {json : {hasura_id : id}},
-                                                                function (error, response, body){
+                                                            opt.body = {hasura_id : id};
+                                                            opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                                            request(opt, function (error, response, body){
                                                                     if(error || response.statusCode != 200)
                                                                         console.log('id ' + id + ' not created successfully please delete from auth');
                                                                 });
@@ -221,10 +222,9 @@ headers['X-Hasura-User-Id'] = 1;
                                 }
 
                                 // delete user from auth table
-                                request.post(
-                                    'https://auth.outfight74.hasura-app.io/admin/user/delete',
-                                    {json : {hasura_id : id}},
-                                    function (error, response, body){
+                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                opt.body = {hasura_id : id};
+                                request(opt, function (error, response, body){
                                         if(error || response.statusCode != 200) // delete request not sent or not processed
                                             console.log('id '+id +' not created successfully please delete from auth table');
 
@@ -258,24 +258,80 @@ headers['X-Hasura-User-Id'] = 1;
                             }
                         }
                         // create employer_info
-                        request.post(
-                        'https://data.outfight74.hasura-app.io/v1/query',
-                        { json: addEmployerInfo },
-                        function (error, response, body) {
+                        opt.url = "https://data.outfight74.hasura-app.io/v1/query";
+                        opt.body = addEmployerInfo;
+                        request(opt, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
                                 // employer_info created successfully
                             
                                 // assign role to employer
-                                request.post(
-                                    'https://auth.outfight74.hasura-app.io/admin/user/assign-role',
-                                    {json : {
+                                opt.url = 'https://auth.outfight74.hasura-app.io/admin/user/assign-role';
+                                opt.body = {
                                                 hasura_id : id,
                                                 role : 'employer'
-                                            }
-                                    },
-                                    function (error, response, body){
+                                            };
+                                request(opt, function (error, response, body){
                                         if(!error && response.statusCode === 200){
                                             // role assigned successfully add skills
+                                            var skillList = req.body.skillList;
+
+                                            var addSkillList = {
+                                                type : "insert",
+                                                args : {
+                                                    table : "student_skills",
+                                                    objects : [
+                                                            //{id:8,skill:"laravel"},{id:8,skill:".net"}
+                                                            
+                                                        ]
+                                                }
+                                            }
+
+                                            var i = 0;
+                                            while(i < skillList.length){
+                                                addSkillList.args.objects.push({id : id, skill : skillList[i]});
+                                                i++;
+                                            }
+                                            opt.body = addSkillList;
+                                            opt.url = "https://data.outfight74.hasura-app.io/v1/query"
+                                            request(opt, function(error, response, body){
+                                                            if(!error && response.statusCode === 200){
+                                                                // skills written signup complete
+                                                                res.send('Success');
+                                                            }
+                                                            else{
+                                                                // skills not written -- delete from employer_info as well as auth
+                                                                var deleteEmployerInfo = {
+                                                                    type : "delete",
+                                                                    args : {
+                                                                        table : "employer_info",
+                                                                        where : {emp_id : id}
+                                                                    }
+                                                                };
+                                                                opt.body = deleteEmployerInfo;
+                                                                opt.url = "https://data.outfight74.hasura-app.io/v1/query";
+                                                                request(opt, function (error, response, body){
+                                                                            if(!error && response.statusCode === 200){
+                                                                                // no error delete from auth table
+                                                                                opt.body = {hasura_id : id};
+                                                                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                                                                request(opt, function (error, response, body){
+                                                                                        if(error || response.statusCode != 200)
+                                                                                            console.log('id ' + id + ' not created successfully please delete from auth');
+                                                                                    });
+                                                                            }
+                                                                            else{ // user not deleted from student_info
+                                                                                console.log('id '+id +' not created successfully please delete from auth table and employer_info');
+
+                                                                            }
+                                                                                
+                                                    
+                                                                        }
+                                                                    );
+                                                                // send error response to client
+                                                                res.send('Something seems to be wrong please try again');
+                                                            }
+                                                        }
+                                                );
 
                                         }
                                         else{
@@ -289,16 +345,14 @@ headers['X-Hasura-User-Id'] = 1;
                                                                 where : {emp_id : id}
                                                             }
                                                         };
-                                            request.post(
-                                                    'https://data.outfight74.hasura-app.io/v1/query',
-                                                    {json : deleteEmployerInfo},
-                                                    function (error, response, body){
+                                                        opt.body = deleteEmployerInfo;
+                                                        opt.url = 'https://data.outfight74.hasura-app.io/v1/query';
+                                            request(opt, function (error, response, body){
                                                         if(!error && response.statusCode === 200){
                                                             // no error delete from auth table
-                                                            request.post(
-                                                                'https://auth.outfight74.hasura-app.io/admin/user/delete',
-                                                                {json : {hasura_id : id}},
-                                                                function (error, response, body){
+                                                            opt.body = {hasura_id : id};
+                                                            opt.url = 'https://auth.outfight74.hasura-app.io/admin/user/delete';
+                                                            request(opt, function (error, response, body){
                                                                     if(error || response.statusCode != 200)
                                                                         console.log('id ' + id + ' not created successfully please delete from auth');
                                                                 });
@@ -332,10 +386,9 @@ headers['X-Hasura-User-Id'] = 1;
                                 }
 
                                 // delete user from auth table
-                                request.post(
-                                    'https://auth.outfight74.hasura-app.io/admin/user/delete',
-                                    {json : {"hasura_id" : id}},
-                                    function (error, response, body){
+                                opt.url = 'https://auth.outfight74.hasura-app.io/admin/user/delete';
+                                opt.body = {hasura_id : id};
+                                request(opt, function (error, response, body){
                                         if(error || response.statusCode != 200) // delete request not sent or not processed
                                             console.log('id '+id +' not created successfully please delete from auth table');
                                         
@@ -399,7 +452,6 @@ app.get('/', function (req, res) {
       e.stackTrace();
       res.send('Error in fetching current schema: ' + e.toString());
     });
-  //res.send('hello world');
 });
 
 /*
