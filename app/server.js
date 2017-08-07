@@ -69,6 +69,7 @@ headers['X-Hasura-User-Id'] = 1;
                 // create user as per role in employer or student table
                 if(req.body.role === 'student'){
                         // generate addStudentInfo object
+                        
                         var addStudentInfo = {
                             type : "insert",
                             args : {
@@ -131,7 +132,7 @@ headers['X-Hasura-User-Id'] = 1;
                                             request(opt, function(error, response, body){
                                                             if(!error && response.statusCode === 200){
                                                                 // skills written signup complete
-                                                                res.send('Success');
+                                                                res.status(response.statusCode).send(JSON.stringify({message : "success"}));
                                                                 // logut the user
                                                                 opt.method = "GET";
                                                             }
@@ -165,7 +166,8 @@ headers['X-Hasura-User-Id'] = 1;
                                                                         }
                                                                     );
                                                                 // send error response to client
-                                                                res.send('Something seems to be wrong please try again');
+                                                                res.status(response.statusCode).send(JSON.stringify({message : "Something seems to be wrong please try again"}));
+                                                            
                                                             }
                                                         }
                                                 );
@@ -203,7 +205,7 @@ headers['X-Hasura-User-Id'] = 1;
                                                 );                                                                                      
                               
                                                 // send error message to client
-                                                res.send('Something seems to be wrong please try again');
+                                                res.status(response.statusCode).send(JSON.stringify({message : "Something seems to be wrong please try again"}));
                                         }
                                     }
                                 );
@@ -214,11 +216,11 @@ headers['X-Hasura-User-Id'] = 1;
 
                                 // depending on reason for not creation send response to client
                                 if(response.statusCode != 200){ // bad request -- violation of unique constraint on email column
-                                    res.send('Sorry this email is already in use');                                    
+                                    res.status(response.statusCode).send(JSON.stringify({message : "Sorry this email is already in use"}));                                  
                                 }
                                 else if(error){
                                     // request not sent to student_info API possibly due to network failure
-                                    res.send('Something seems to be wrong please try again');
+                                    res.status(response.statusCode).send(JSON.stringify({message : "Something seems to be wrong please try again"}));
                                 }
 
                                 // delete user from auth table
@@ -239,6 +241,7 @@ headers['X-Hasura-User-Id'] = 1;
                 }
                 else if(req.body.role === 'employer'){
                         // generate addEmployerInfo object
+                        
                         var addEmployerInfo = {
                             type : "insert",
                             args : {
@@ -296,7 +299,7 @@ headers['X-Hasura-User-Id'] = 1;
                                             request(opt, function(error, response, body){
                                                             if(!error && response.statusCode === 200){
                                                                 // skills written signup complete
-                                                                res.send('Success');
+                                                                res.status(response.statusCode).send(JSON.stringify({message : "success"}));
                                                             }
                                                             else{
                                                                 // skills not written -- delete from employer_info as well as auth
@@ -328,7 +331,7 @@ headers['X-Hasura-User-Id'] = 1;
                                                                         }
                                                                     );
                                                                 // send error response to client
-                                                                res.send('Something seems to be wrong please try again');
+                                                                res.status(response.statusCode).send(JSON.stringify({message : "Something seems to be wrong please try again"}));
                                                             }
                                                         }
                                                 );
@@ -367,7 +370,7 @@ headers['X-Hasura-User-Id'] = 1;
                                                 );                                                                                      
                               
                                                 // send error message to client
-                                                res.send('Something seems to be wrong please try again');
+                                                res.status(response.statusCode).send(JSON.stringify({message : "Something seems to be wrong please try again"}));
                                         }
                                     }
                                 );
@@ -378,11 +381,11 @@ headers['X-Hasura-User-Id'] = 1;
 
                                 // depending on reason for not creation send response to client
                                 if(response.statusCode != 200){ // bad request -- violation of unique constraint on email column
-                                    res.send('Sorry this email is already in use');                                    
+                                    res.status(response.statusCode).send(JSON.stringify({message : "Sorry this email is already in use"}));                                   
                                 }
                                 else if(error){
                                     // request not sent to employer_info API possibly due to network failure
-                                    res.send('Something seems to be wrong please try again');
+                                    res.status(response.statusCode).send(JSON.stringify({message : "Something seems to be wrong please try again"}));
                                 }
 
                                 // delete user from auth table
@@ -404,11 +407,11 @@ headers['X-Hasura-User-Id'] = 1;
             else{ // user not created in auth table
                 if(response.statusCode != 200){
                     // bad request send response code -- user NOT created in auth table
-                    res.send(body.code);
+                    res.status(response.statusCode).send(JSON.stringify({message: "sorry this username is already taken"}));
                 }
                 else{ // error
                     // send error message -- request not reached auth API
-                    res.send('Something seems to be wrong please try again');
+                    res.status(response.statusCode).send(JSON.stringify({message : "Something seems to be wrong please try again"}));
                 }   
             }
         }
