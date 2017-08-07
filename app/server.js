@@ -9,7 +9,7 @@ app.use(morgan('combined'));
 app.use(bodyParser.json());
 
 var DEVELOPMENT = (process.env.NODE_ENV == 'production') ? false : true;
-
+console.log(DEVELOPMENT);
 // Talking to the database
 var headers = {'Content-Type': 'application/json'};
 var url;
