@@ -26,7 +26,6 @@ if (DEVELOPMENT) {
 // Make a request to the data API as the admin role for full access
 headers['X-Hasura-Role'] = 'admin';
 headers['X-Hasura-User-Id'] = 1;
-headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
 
  app.post('/', function (req, res) {
 
@@ -58,7 +57,7 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
     console.log(opt);
     // create new user in hasura auth table
     opt.body = authTableUser;
-    opt.url = "https://auth.outfight74.hasura-app.io/signup";
+    opt.url = "http://auth.hasura/signup";
     request(opt, function (error, response, body) {
             console.log(opt);
             if (!error && response.statusCode === 200) {
@@ -94,7 +93,7 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                         
                         // create student_info
                         opt.body = addStudentInfo;
-                        opt.url = "https://data.outfight74.hasura-app.io/v1/query"
+                        opt.url = "http://data.hasura/v1/query"
                         console.log("options are " + opt.headers);
                         request(opt, function (error, response, body) {
 
@@ -102,7 +101,7 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                           
                             if (!error && response.statusCode === 200) { // student_info created successfully
                                 // assign role to student
-                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/assign-role"
+                                opt.url = "http://auth.hasura/admin/user/assign-role"
                                 opt.body = {    hasura_id : id,
                                                 role : 'student'
                                             };
@@ -128,7 +127,7 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                                 i++;
                                             }
                                             opt.body = addSkillList;
-                                            opt.url = "https://data.outfight74.hasura-app.io/v1/query"
+                                            opt.url = "http://data.hasura/v1/query"
                                             request(opt, function(error, response, body){
                                                             if(!error && response.statusCode === 200){
                                                                 // skills written signup complete
@@ -146,12 +145,12 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                                                     }
                                                                 };
                                                                 opt.body = deleteStudentInfo;
-                                                                opt.url = "https://data.outfight74.hasura-app.io/v1/query";
+                                                                opt.url = "http://data.hasura/v1/query";
                                                                 request(opt, function (error, response, body){
                                                                             if(!error && response.statusCode === 200){
                                                                                 // no error delete from auth table
                                                                                 opt.body = {hasura_id : id};
-                                                                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                                                                opt.url = "http://auth.hasura/admin/user/delete";
                                                                                 request(opt, function (error, response, body){
                                                                                         if(error || response.statusCode != 200)
                                                                                             console.log('id ' + id + ' not created successfully please delete from auth');
@@ -183,12 +182,12 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                                             }
                                                         };
                                             opt.body = deleteStudentInfo;
-                                            opt.url = "https://data.outfight74.hasura-app.io/v1/query";       
+                                            opt.url = "http://data.hasura/v1/query";       
                                             request(opt, function (error, response, body){
                                                         if(!error && response.statusCode === 200){
                                                             // no error delete from auth table
                                                             opt.body = {hasura_id : id};
-                                                            opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                                            opt.url = "http://auth.hasura/admin/user/delete";
                                                             request(opt, function (error, response, body){
                                                                     if(error || response.statusCode != 200)
                                                                         console.log('id ' + id + ' not created successfully please delete from auth');
@@ -223,7 +222,7 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                 }
 
                                 // delete user from auth table
-                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                opt.url = "http://auth.hasura/admin/user/delete";
                                 opt.body = {hasura_id : id};
                                 request(opt, function (error, response, body){
                                         if(error || response.statusCode != 200) // delete request not sent or not processed
@@ -259,14 +258,14 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                             }
                         }
                         // create employer_info
-                        opt.url = "https://data.outfight74.hasura-app.io/v1/query";
+                        opt.url = "http://data.hasura/v1/query";
                         opt.body = addEmployerInfo;
                         request(opt, function (error, response, body) {
                             if (!error && response.statusCode == 200) {
                                 // employer_info created successfully
                             
                                 // assign role to employer
-                                opt.url = 'https://auth.outfight74.hasura-app.io/admin/user/assign-role';
+                                opt.url = 'http://auth.hasura/admin/user/assign-role';
                                 opt.body = {
                                                 hasura_id : id,
                                                 role : 'employer'
@@ -293,7 +292,7 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                                 i++;
                                             }
                                             opt.body = addSkillList;
-                                            opt.url = "https://data.outfight74.hasura-app.io/v1/query"
+                                            opt.url = "http://data.hasura/v1/query"
                                             request(opt, function(error, response, body){
                                                             if(!error && response.statusCode === 200){
                                                                 // skills written signup complete
@@ -309,12 +308,12 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                                                     }
                                                                 };
                                                                 opt.body = deleteEmployerInfo;
-                                                                opt.url = "https://data.outfight74.hasura-app.io/v1/query";
+                                                                opt.url = "http://data.hasura/v1/query";
                                                                 request(opt, function (error, response, body){
                                                                             if(!error && response.statusCode === 200){
                                                                                 // no error delete from auth table
                                                                                 opt.body = {hasura_id : id};
-                                                                                opt.url = "https://auth.outfight74.hasura-app.io/admin/user/delete";
+                                                                                opt.url = "http://auth.hasura/admin/user/delete";
                                                                                 request(opt, function (error, response, body){
                                                                                         if(error || response.statusCode != 200)
                                                                                             console.log('id ' + id + ' not created successfully please delete from auth');
@@ -347,12 +346,12 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                                             }
                                                         };
                                                         opt.body = deleteEmployerInfo;
-                                                        opt.url = 'https://data.outfight74.hasura-app.io/v1/query';
+                                                        opt.url = 'http://data.hasura/v1/query';
                                             request(opt, function (error, response, body){
                                                         if(!error && response.statusCode === 200){
                                                             // no error delete from auth table
                                                             opt.body = {hasura_id : id};
-                                                            opt.url = 'https://auth.outfight74.hasura-app.io/admin/user/delete';
+                                                            opt.url = 'http://auth.hasura/admin/user/delete';
                                                             request(opt, function (error, response, body){
                                                                     if(error || response.statusCode != 200)
                                                                         console.log('id ' + id + ' not created successfully please delete from auth');
@@ -387,7 +386,7 @@ headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
                                 }
 
                                 // delete user from auth table
-                                opt.url = 'https://auth.outfight74.hasura-app.io/admin/user/delete';
+                                opt.url = 'http://auth.hasura/admin/user/delete';
                                 opt.body = {hasura_id : id};
                                 request(opt, function (error, response, body){
                                         if(error || response.statusCode != 200) // delete request not sent or not processed
