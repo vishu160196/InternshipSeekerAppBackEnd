@@ -42,7 +42,7 @@ headers['X-Hasura-User-Id'] = 1;
     private String role;
     private List<String> skillList;
     private Integer id; */
-    console.log(req.body);
+    
     // extract username and password from req body
     var authTableUser = {
                         username:  req.body.signUpUsername,
@@ -96,9 +96,7 @@ headers['X-Hasura-User-Id'] = 1;
                         console.log("options are" + opt);
                         request(opt, function (error, response, body) {
 
-                          console.log(response);
-                          console.log(error);
-                          console.log(body);
+                         
                           
                             if (!error && response.statusCode === 200) { // student_info created successfully
                                 // assign role to student
