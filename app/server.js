@@ -26,6 +26,7 @@ if (DEVELOPMENT) {
 // Make a request to the data API as the admin role for full access
 headers['X-Hasura-Role'] = 'admin';
 headers['X-Hasura-User-Id'] = 1;
+headers['Authorization'] = 'Bearer ' + process.env.ADMIN_TOKEN;
 
  app.post('/', function (req, res) {
 
@@ -423,7 +424,7 @@ app.get('/', function (req, res) {
     body: JSON.stringify({
       type: 'select',
       args: {
-        table: "student_info",
+        table: "skill_field_relation",
         columns: ['*']//,
         //where: { table_schema: 'public' }
     }})
