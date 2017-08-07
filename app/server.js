@@ -89,10 +89,11 @@ headers['X-Hasura-User-Id'] = 1;
                                     ]
                             }
                         };
-
+                        
                         // create student_info
                         opt.body = addStudentInfo;
                         opt.url = "https://data.outfight74.hasura-app.io/v1/query"
+                        console.log(opt);
                         request(opt, function (error, response, body) {
 
                           console.log(response);
